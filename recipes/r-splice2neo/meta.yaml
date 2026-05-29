@@ -7,14 +7,8 @@ package:
   version: {{ version }}
 
 source:
-  - url: https://github.com/TRON-Bioinformatics/splice2neo/archive/refs/tags/v{{ version }}.tar.gz
-    sha256: d8007ee2a370a499ee5a347a88465e95036e872c0af3258bcad9ded0c6ace003
-    folder: splice2neo_src
-  # liftOver is a Bioconductor workflow package not available via conda;
-  # bundle the source so it can be installed during build.
-  - url: https://www.bioconductor.org/packages/3.23/workflows/src/contrib/liftOver_{{ liftover_version }}.tar.gz
-    sha256: f7abbe5f531b17f05d99bbd03bae405e65b4aba3a2eff25e01f766d32273d419
-    folder: liftover_src
+  url: https://github.com/TRON-Bioinformatics/splice2neo/archive/refs/tags/v{{ version }}.tar.gz
+  sha256: d8007ee2a370a499ee5a347a88465e95036e872c0af3258bcad9ded0c6ace003
 
 build:
   number: 0
@@ -24,10 +18,14 @@ build:
     - lib/
   run_exports:
     - {{ pin_subpackage(name, max_pin="x.x") }}
+  script:
+    - export DISABLE_AUTOBREW=1
+    - ${R} CMD INSTALL --build . "${R_ARGS}"
 
 # FIXME Enable cross-compilation to ARM platforms. You'll need to deal with
 # the issue laid out here:
 # https://github.com/bioconda/bioconda-recipes/pull/65691#issuecomment-4542058008.
+# Technically the package Imports liftOver, but that is never actually used.
 requirements:
   host:
     - r-base >=4.4
